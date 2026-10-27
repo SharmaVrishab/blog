@@ -7,12 +7,13 @@ import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
 import IconSearch from "@/assets/icons/IconSearch.svg";
 import IconMoon from "@/assets/icons/IconMoon.svg";
 import IconX from "@/assets/icons/IconX.svg";
+import IconHome from "@/assets/icons/IconHome.svg";
 import LinkButton from "./LinkButton.astro";
 import { stripBase, stripLocale } from "@/utils/withBase";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
 
-const { site, features } = config;
+const { features } = config;
 
 const locale = Astro.currentLocale ?? config.site.lang;
 const t = useTranslations(locale);
@@ -50,9 +51,11 @@ const isActive = (path: string) => {
   >
     <a
       href={getRelativeLocaleUrl(locale, "")}
-      class="absolute py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"
+      class="focus-outline absolute top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center sm:static sm:top-auto sm:translate-y-0"
+      aria-label={t.nav.home}
+      title={t.nav.home}
     >
-      {site.title}
+      <IconHome class="size-6" />
     </a>
     <nav
       id="nav-menu"
