@@ -1,0 +1,187 @@
+---
+import type { CollectionEntry } from "astro:content";
+import dayjs from "dayjs";
+import config from "@/config";
+import { tplStr, useTranslations } from "@/i18n";
+import { getPostActivity, type ActivityDay } from "@/utils/getPostActivity";
+
+type Props = {
+  posts: CollectionEntry<"posts">[];
+};
+
+const { posts } = Astro.props;
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(locale);
+const activity = getPostActivity(posts, locale);
+const { activity: copy } = t.home;
+
+const levelClass = [
+  "bg-muted",
+  "bg-accent/55",
+  "bg-accent/70",
+  "bg-accent/85",
+  "bg-accent",
+] as const;
+
+const monthByWeek = new Map(
+  activity.monthLabels.map(item => [item.weekIndex, item.label])
+);
+
+const countLabel = tplStr(
+  activity.total === 1 ? copy.postInYear : copy.postsInYear,
+  { count: activity.total }
+);
+
+const weekdayLabel = ["", copy.mon, "", copy.wed, "", copy.fri, ""];
+
+function level(count: number) {
+  if (count <= 0) return 0;
+  if (count >= 4) return 4;
+  return count;
+}
+
+function formatActivityDate(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+  return dayjs(new Date(year, month - 1, day)).format("D MMM, YYYY");
+}
+
+function cellLabel(day: ActivityDay) {
+  const date = formatActivityDate(day.date);
+  if (day.count === 0) return tplStr(copy.noPosts, { date });
+
+  const summary = tplStr(day.count === 1 ? copy.postOn : copy.postsOn, {
+    count: day.count,
+    date,
+  });
+  return `${summary}. ${day.posts.map(post => post.title).join(", ")}`;
+}
+
+function tooltipAlign(weekIndex: number) {
+  if (weekIndex < 10) return "start-0";
+  if (weekIndex >= activity.weeks.length - 10) return "end-0";
+  return "left-1/2 -translate-x-1/2 rtl:right-1/2 rtl:left-auto rtl:translate-x-1/2";
+}
+---
+
+<section
+  id="activity"
+  class="border-border border-b pt-12 pb-6"
+  aria-labelledby="activity-title"
+>
+  <h2 id="activity-title" class="text-2xl font-semibold tracking-wide">
+    {copy.title}
+  </h2>
+  <p class="text-muted-foreground mt-2 text-sm">{countLabel}</p>
+
+  <div
+    class="activity-grid mt-4 grid w-full gap-px pe-6 sm:gap-[2px]"
+    style={`--weeks: ${activity.weeks.length}`}
+  >
+    <div class="h-4" aria-hidden="true"></div>
+    {
+      activity.weeks.map((_, weekIndex) => {
+        const month = monthByWeek.get(weekIndex);
+        return (
+          <div class="relative h-4 min-w-0" aria-hidden="true">
+            {month && (
+              <span
+                class:list={[
+                  "text-muted-foreground absolute top-0 text-[10px] leading-4 whitespace-nowrap",
+                  weekIndex >= activity.weeks.length - 2 ? "end-0" : "start-0",
+                ]}
+              >
+                {month}
+              </span>
+            )}
+          </div>
+        );
+      })
+    }
+    {
+      weekdayLabel.map((label, row) => (
+        <>
+          <div
+            class="text-muted-foreground overflow-hidden text-[10px] leading-none"
+            aria-hidden="true"
+          >
+            <span class="hidden sm:inline">{label}</span>
+          </div>
+          {activity.weeks.map((week, weekIndex) => {
+            const day = week.days[row];
+            return day ? (
+              <div
+                class:list={[
+                  "group relative aspect-square w-full min-w-0 rounded-sm hover:z-20",
+                  levelClass[level(day.count)],
+                ]}
+                role={day.count > 0 ? "img" : undefined}
+                aria-label={day.count > 0 ? cellLabel(day) : undefined}
+              >
+                <div
+                  aria-hidden="true"
+                  class:list={[
+                    "pointer-events-none absolute bottom-full z-10 hidden pb-1.5 group-hover:block",
+                    tooltipAlign(weekIndex),
+                  ]}
+                >
+                  <div class="bg-background border-border w-max max-w-56 rounded-md border px-2.5 py-1.5 text-start">
+                    {day.count === 0 ? (
+                      <p class="text-muted-foreground text-xs">
+                        {cellLabel(day)}
+                      </p>
+                    ) : (
+                      <p class="text-muted-foreground text-xs">
+                        {formatActivityDate(day.date)}
+                      </p>
+                    )}
+                    {day.count === 1 && (
+                      <p class="mt-0.5 text-xs font-medium">
+                        {day.posts[0].title}
+                      </p>
+                    )}
+                    {day.count > 1 && (
+                      <ul class="mt-0.5">
+                        {day.posts.map(post => (
+                          <li class="text-xs font-medium">{post.title}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div class="aspect-square min-w-0" aria-hidden="true" />
+            );
+          })}
+        </>
+      ))
+    }
+  </div>
+
+  <style>
+    .activity-grid {
+      grid-template-columns: 0 repeat(var(--weeks), minmax(0, 1fr));
+    }
+    @media (min-width: 40rem) {
+      .activity-grid {
+        grid-template-columns: 1.75rem repeat(var(--weeks), minmax(0, 1fr));
+      }
+    }
+  </style>
+
+  <div
+    class="text-muted-foreground mt-3 flex items-center justify-end gap-1 text-xs"
+  >
+    <span>{copy.less}</span>
+    {
+      levelClass.map(color => (
+        <span
+          class:list={["size-[11px] rounded-sm", color]}
+          aria-hidden="true"
+        />
+      ))
+    }
+    <span>{copy.more}</span>
+  </div>
+</section>

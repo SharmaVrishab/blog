@@ -9,6 +9,7 @@ import Footer from "@/components/Footer.astro";
 import Socials from "@/components/Socials.astro";
 import Card from "@/components/Card.astro";
 import LinkButton from "@/components/LinkButton.astro";
+import PostActivity from "@/components/PostActivity.astro";
 import { getSortedPosts } from "@/utils/getSortedPosts";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
@@ -73,6 +74,8 @@ const homePath = getRelativeLocaleUrl(locale, "");
         )
       }
     </section>
+
+    <PostActivity posts={sortedPosts} />
 
     {
       featuredPosts.length > 0 && (

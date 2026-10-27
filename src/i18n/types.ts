@@ -30,6 +30,19 @@ export interface UIStrings {
     featured: string;
     recentPosts: string;
     allPosts: string;
+    activity: {
+      title: string;
+      postInYear: string;
+      postsInYear: string;
+      less: string;
+      more: string;
+      mon: string;
+      wed: string;
+      fri: string;
+      noPosts: string;
+      postOn: string;
+      postsOn: string;
+    };
   };
   footer: {
     copyright: string;
