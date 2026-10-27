@@ -97,8 +97,16 @@
       @apply border-s-accent/80 wrap-break-word opacity-80;
     }
 
-    details:not(.callout) {
+    details:not(.callout):not(.fold) {
       @apply text-foreground inline-block cursor-pointer select-none [&_p]:hidden [&_ul]:my-0!;
+    }
+
+    details.fold {
+      @apply my-8 block w-full border-t border-dashed pt-4;
+    }
+
+    details.fold summary {
+      @apply cursor-pointer text-xl font-medium;
     }
 
     summary {
