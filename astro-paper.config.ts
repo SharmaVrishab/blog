@@ -1,6 +1,8 @@
 import { defineAstroPaperConfig } from "./src/types/config";
 
-const siteUrl = process.env.SITE ?? "https://blog.pages.dev";
+// Change this when the custom domain is ready. `SITE` overrides it for one build.
+const defaultSiteUrl = "https://blog.pages.dev";
+const siteUrl = process.env.SITE || defaultSiteUrl;
 
 export default defineAstroPaperConfig({
   site: {

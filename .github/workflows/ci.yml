@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Check production output
+        run: |
+          if grep -R --include='*.html' -n 'favicon.ico' dist; then
+            echo "favicon.ico is still linked"
+            exit 1
+          fi
+          if ! grep -q 'name="robots" content="noindex, nofollow"' dist/404.html; then
+            echo "404 page is missing noindex"
+            exit 1
+          fi
+          missing=$(grep -R -L --include='*.html' 'https://blog.pages.dev' dist || true)
+          if [ -n "$missing" ]; then
+            echo "Pages missing the default canonical host:"
+            echo "$missing"
+            exit 1
+          fi

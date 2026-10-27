@@ -19,6 +19,10 @@ The GitHub repo can deploy on every push to `main`. In the Cloudflare Worker bui
 
 `wrangler.jsonc` publishes the static `dist` folder. Leave the Astro Cloudflare adapter off. Wrangler’s automatic Astro setup adds that adapter and the build fails.
 
-Set the `SITE` environment variable to the production URL. Canonical links and the sitemap use that host. If `SITE` is unset, the build uses `https://blog.pages.dev`.
+The default site URL is `defaultSiteUrl` in `astro-paper.config.ts`, currently `https://blog.pages.dev`. Change that constant when the custom domain is ready. Canonical links, the sitemap, and RSS use it. Set the `SITE` environment variable to override the constant for one build. An unset or empty `SITE` keeps the default.
 
 Posts go in `src/content/posts/`. Site name, description, and social links are in `astro-paper.config.ts`.
+
+## Rollback
+
+In the Cloudflare dashboard, open Workers, then `blog`, then Deployments. Choose the last known-good deployment and roll back to it.

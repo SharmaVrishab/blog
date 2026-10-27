@@ -9,9 +9,14 @@ import config from "@/config";
 
 const locale = Astro.currentLocale ?? config.site.lang;
 const t = useTranslations(locale);
+const canonicalURL = new URL("/404", config.site.url).href;
 ---
 
-<Layout title={`${t.notFound.title} | ${config.site.title}`}>
+<Layout
+  title={`${t.notFound.title} | ${config.site.title}`}
+  canonicalURL={canonicalURL}
+  noindex
+>
   <Header />
 
   <main

@@ -39,6 +39,7 @@ const homePath = getRelativeLocaleUrl(locale, "");
       </h1>
       <a
         target="_blank"
+        rel="noopener noreferrer"
         href={`${import.meta.env.BASE_URL.replace(/\/?$/, "/")}rss.xml`}
         class="inline-block"
         aria-label="RSS Feed"
@@ -58,8 +59,8 @@ const homePath = getRelativeLocaleUrl(locale, "");
         systems I build. From Linux internals and networking to automation and
         containerization, I share hands-on experiments, troubleshooting notes,
         and technical deep dives. I believe the best way to understand
-        technology is to build things, break them, figure out why they fail,
-        and learn how to make them better.
+        technology is to build things, break them, figure out why they fail, and
+        learn how to make them better.
       </p>
       {
         socials.length > 0 && (

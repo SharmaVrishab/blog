@@ -6,7 +6,7 @@ featured: false
 draft: false
 tags:
   - notes
-description: Starting this blog.
+description: Starting notes on Linux, DevOps, cloud infrastructure, and cybersecurity.
 ---
 
-This is the first post. I'll write here about data engineering and the projects I'm building.
+This is the first post. I'll write here about Linux, DevOps, cloud infrastructure, and cybersecurity, and about the systems I'm building.
