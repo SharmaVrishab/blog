@@ -2,6 +2,7 @@
   "name": "blog",
   "type": "module",
   "version": "0.1.0",
+  "packageManager": "pnpm@10.30.3",
   "engines": {
     "node": ">=22.12.0"
   },
