@@ -7,7 +7,7 @@ export default defineAstroPaperConfig({
     url: siteUrl,
     title: "Vrishab",
     description:
-      "Notes on data engineering, pipelines, and projects I'm building.",
+      "Notes on Linux, DevOps, cloud infrastructure, and cybersecurity.",
     author: "Vrishab",
     profile: "https://github.com/SharmaVrishab",
     ogImage: "default-og.jpg",
@@ -28,10 +28,7 @@ export default defineAstroPaperConfig({
     editPost: { enabled: false },
     search: "pagefind",
   },
-  socials: [
-    { name: "github", url: "https://github.com/SharmaVrishab" },
-    { name: "mail", url: "mailto:vrishabsharma1111@gmail.com" },
-  ],
+  socials: [{ name: "github", url: "https://github.com/SharmaVrishab" }],
   shareLinks: [
     { name: "whatsapp", url: "https://wa.me/?text=" },
     { name: "facebook", url: "https://www.facebook.com/sharer.php?u=" },
