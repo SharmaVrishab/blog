@@ -1,0 +1,176 @@
+---
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(locale);
+---
+
+<nav id="on-this-page" class="on-this-page" aria-label={t.a11y.onThisPage} hidden>
+  <div class="on-this-page-inner">
+    <p class="on-this-page-label on-this-page-label-rail">{t.a11y.onThisPage}</p>
+    <button
+      type="button"
+      class="on-this-page-toggle"
+      aria-expanded="false"
+      aria-controls="on-this-page-list"
+    >
+      <span class="on-this-page-toggle-copy">
+        <span class="on-this-page-label">{t.a11y.onThisPage}</span>
+        <span class="on-this-page-current"></span>
+      </span>
+      <svg
+        class="on-this-page-chevron"
+        viewBox="0 0 16 16"
+        width="16"
+        height="16"
+        aria-hidden="true"
+      >
+        <path
+          d="M4 6.25 8 10.25 12 6.25"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+    </button>
+    <ul id="on-this-page-list"></ul>
+  </div>
+</nav>
+
+<script>
+  const ACTIVE_LINE = 96;
+
+  function headingLabel(heading: HTMLElement) {
+    const clone = heading.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll(".heading-link").forEach(node => node.remove());
+    return (clone.textContent ?? "").replace(/\s+#\s*$/, "").trim();
+  }
+
+  function slugify(text: string) {
+    const slug = text
+      .toLowerCase()
+      .trim()
+      .replace(/['"]/g, "")
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-");
+    return slug || "section";
+  }
+
+  function ensureId(heading: HTMLElement, label: string) {
+    if (heading.id) return heading.id;
+    const base = slugify(label);
+    let id = base;
+    let n = 2;
+    while (document.getElementById(id)) id = `${base}-${n++}`;
+    heading.id = id;
+    return id;
+  }
+
+  let stopTracking = () => {};
+
+  function initOnThisPage() {
+    stopTracking();
+
+    const nav = document.getElementById("on-this-page");
+    const list = nav?.querySelector("ul");
+    const toggle = nav?.querySelector<HTMLButtonElement>(".on-this-page-toggle");
+    const currentLabel = nav?.querySelector(".on-this-page-current");
+    const root = document.querySelector<HTMLElement>("[data-toc-root]");
+    if (!nav || !list || !root) return;
+
+    const headings = Array.from(root.querySelectorAll<HTMLElement>("h2")).flatMap(
+      heading => {
+        if (heading.closest("#on-this-page")) return [];
+        const label = headingLabel(heading);
+        if (!label || label.toLowerCase() === "table of contents") return [];
+        return [{ heading, label, id: ensureId(heading, label) }];
+      }
+    );
+
+    list.replaceChildren();
+
+    if (headings.length < 2) {
+      nav.hidden = true;
+      return;
+    }
+
+    const links: HTMLAnchorElement[] = [];
+
+    for (const item of headings) {
+      const li = document.createElement("li");
+      const link = document.createElement("a");
+      link.href = `#${item.id}`;
+      link.textContent = item.label;
+      li.append(link);
+      list.append(li);
+      links.push(link);
+    }
+
+    nav.hidden = false;
+    nav.classList.remove("is-open");
+    toggle?.setAttribute("aria-expanded", "false");
+
+    const setOpen = (open: boolean) => {
+      nav.classList.toggle("is-open", open);
+      toggle?.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+
+    const setActive = (id: string) => {
+      for (const link of links) {
+        const on = link.getAttribute("href") === `#${id}`;
+        link.classList.toggle("is-active", on);
+        if (on) {
+          link.setAttribute("aria-current", "location");
+          if (currentLabel) currentLabel.textContent = link.textContent;
+        } else {
+          link.removeAttribute("aria-current");
+        }
+      }
+    };
+
+    const update = () => {
+      let current = headings[0];
+      for (const item of headings) {
+        if (item.heading.getBoundingClientRect().top <= ACTIVE_LINE) {
+          current = item;
+        }
+      }
+      setActive(current.id);
+    };
+
+    const onToggle = () => setOpen(!nav.classList.contains("is-open"));
+    const onListClick = (event: MouseEvent) => {
+      const link = (event.target as HTMLElement | null)?.closest("a");
+      if (!link) return;
+      if (window.matchMedia("(max-width: 1239px)").matches) setOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    const onPointer = (event: MouseEvent) => {
+      if (!nav.contains(event.target as Node)) setOpen(false);
+    };
+
+    toggle?.addEventListener("click", onToggle);
+    list.addEventListener("click", onListClick);
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("click", onPointer);
+    document.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+
+    stopTracking = () => {
+      toggle?.removeEventListener("click", onToggle);
+      list.removeEventListener("click", onListClick);
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("click", onPointer);
+      document.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }
+
+  document.addEventListener("astro:page-load", initOnThisPage);
+  initOnThisPage();
+</script>

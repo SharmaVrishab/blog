@@ -1,5 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n";
+import OnThisPage from "@/components/OnThisPage.astro";
 import config from "@/config";
 
 type Props = {
@@ -18,11 +19,13 @@ const backUrl = config.features.showBackButton
 
 <main
   data-backUrl={backUrl}
+  data-toc-root
   id="main-content"
-  class:list={["app-layout pb-4", className]}
+  class:list={["app-layout relative pb-4", className]}
 >
   <h1 class="text-2xl font-semibold sm:text-3xl">{pageTitle}</h1>
   <p class="mt-2 mb-6 italic">{pageDesc}</p>
+  <OnThisPage />
   <slot />
 </main>
 

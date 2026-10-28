@@ -37,3 +37,169 @@
 :target {
   scroll-margin-block: 1rem;
 }
+
+/* "On this page". Wide screens use a sticky rail. Narrow screens use a
+   compact card that shows the current section and opens the full list. */
+.on-this-page:not([hidden]) {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin: 0 0 1.25rem;
+  padding: 0.7rem 0 0.35rem;
+  background: var(--background);
+}
+
+.on-this-page-inner {
+  border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+  border-radius: 0.75rem;
+  background: var(--background);
+  padding: 0.7rem 0.85rem;
+}
+
+.on-this-page-label {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.on-this-page-label-rail {
+  display: none;
+}
+
+.on-this-page-toggle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.on-this-page-toggle-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.on-this-page-current {
+  overflow: hidden;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.on-this-page-chevron {
+  flex: none;
+  color: var(--muted-foreground);
+  transition: transform 160ms ease;
+}
+
+.on-this-page.is-open .on-this-page-chevron {
+  transform: rotate(180deg);
+}
+
+.on-this-page ul {
+  display: none;
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0 0.1rem;
+  list-style: none;
+  flex-direction: column;
+  gap: 0.15rem;
+  border-top: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+  max-height: min(50dvh, 18rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.on-this-page.is-open ul {
+  display: flex;
+}
+
+.on-this-page a {
+  display: block;
+  border-radius: 0.4rem;
+  padding: 0.4rem 0.45rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+
+.on-this-page a:hover,
+.on-this-page a.is-active {
+  color: var(--foreground);
+}
+
+.on-this-page a.is-active {
+  background: color-mix(in srgb, var(--foreground) 6%, transparent);
+  font-weight: 600;
+}
+
+@media (min-width: 1240px) {
+  .on-this-page:not([hidden]) {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(100% + 1.25rem);
+    z-index: 1;
+    width: 12.5rem;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+  }
+
+  .on-this-page-inner {
+    position: sticky;
+    top: 1.5rem;
+    max-height: calc(100dvh - 3rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    background: transparent;
+  }
+
+  .on-this-page-label-rail {
+    display: block;
+  }
+
+  .on-this-page-toggle {
+    display: none;
+  }
+
+  .on-this-page ul,
+  .on-this-page.is-open ul {
+    display: flex;
+    max-height: none;
+    margin-top: 0.85rem;
+    padding: 0;
+    border-top: 0;
+    gap: 0.7rem;
+    overflow: visible;
+  }
+
+  .on-this-page a {
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .on-this-page a.is-active {
+    background: transparent;
+  }
+}
